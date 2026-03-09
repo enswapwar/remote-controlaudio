@@ -1,4 +1,5 @@
 const socket = io();
+
 const audio = document.getElementById("audio");
 const fileInput = document.getElementById("fileInput");
 const confirmBtn = document.getElementById("confirm");
@@ -7,6 +8,7 @@ const status = document.getElementById("status");
 const nameInput = document.getElementById("nameInput");
 
 let registered = false;
+let childName = "";
 
 fileInput.addEventListener("change", () => {
   const file = fileInput.files[0];
@@ -18,8 +20,10 @@ fileInput.addEventListener("change", () => {
 confirmBtn.addEventListener("click", () => {
   if (!audio.src) return;
 
-  const name = nameInput.value.trim();
-  socket.emit("register-child", name);
+  childName = nameInput.value.trim() || "NoName";
+
+  socket.emit("register-child", childName);
+
   registered = true;
   status.textContent = "登録済み";
 });
@@ -27,6 +31,15 @@ confirmBtn.addEventListener("click", () => {
 activateBtn.addEventListener("click", () => {
   audio.play().then(() => audio.pause());
 });
+
+
+/* 再接続時 */
+socket.on("connect", () => {
+  if (registered) {
+    socket.emit("register-child", childName);
+  }
+});
+
 
 socket.on("play", () => {
   if (registered) audio.play();
