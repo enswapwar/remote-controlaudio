@@ -12,4 +12,4 @@ jobs:
       - name: Call Render Deploy Hook
         run: curl -X POST "$RENDER_DEPLOY_HOOK"
         env:
-          RENDER_DEPLOY_HOOK: ${{ https://api.render.com/deploy/srv-d6jo6k75r7bs739jadf0?key=KBJ5-bLDboQ }}
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
