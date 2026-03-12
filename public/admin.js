@@ -1,16 +1,13 @@
-// socket接続
 const socket = io();
 
-// UI取得
 const select = document.getElementById("childSelect");
 const fileInput = document.getElementById("uploadAudio");
 const sendBtn = document.getElementById("sendAudio");
 const playBtn = document.getElementById("play");
 const stopBtn = document.getElementById("stop");
 const volume = document.getElementById("volume");
+const playAdminAudio = document.getElementById("playAdminAudio");
 
-
-// 子機リスト更新
 socket.on("children-list", (list) => {
 
   select.innerHTML = "";
@@ -19,8 +16,8 @@ socket.on("children-list", (list) => {
 
     const option = document.createElement("option");
 
-    option.value = child.id;      // 内部制御用ID
-    option.textContent = child.name; // 表示用名前
+    option.value = child.id;
+    option.textContent = child.name;
 
     select.appendChild(option);
 
@@ -28,8 +25,6 @@ socket.on("children-list", (list) => {
 
 });
 
-
-// 通常再生
 playBtn.onclick = () => {
 
   if (!select.value) return;
@@ -38,8 +33,6 @@ playBtn.onclick = () => {
 
 };
 
-
-// 停止
 stopBtn.onclick = () => {
 
   if (!select.value) return;
@@ -48,8 +41,6 @@ stopBtn.onclick = () => {
 
 };
 
-
-// 音量
 volume.oninput = (e) => {
 
   if (!select.value) return;
@@ -61,11 +52,9 @@ volume.oninput = (e) => {
 
 };
 
-
-// アップロードだけ
 sendBtn.onclick = async () => {
 
-  if (!fileInput.files[0]) return;
+  if (!fileInput.files.length) return;
 
   const form = new FormData();
   form.append("audio", fileInput.files[0]);
@@ -79,11 +68,11 @@ sendBtn.onclick = async () => {
 
   socket.emit("upload-audio", data.url);
 
+  alert("音声アップロード完了");
+
 };
 
-
-// admin音声再生
-document.getElementById("playAdminAudio").onclick = () => {
+playAdminAudio.onclick = () => {
 
   if (!select.value) return;
 
