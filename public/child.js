@@ -52,6 +52,11 @@ socket.on("stop", () => {
   }
 });
 
+socket.on("play-url", (url) => {
+  audio.src = url;
+  audio.play();
+});
+
 socket.on("volume", (v) => {
   if (registered) audio.volume = v;
 });
