@@ -1,3 +1,7 @@
+// 追加: ファイルアップロード用
+const multer = require("multer");
+const path = require("path");
+
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -8,9 +12,23 @@ const io = new Server(server);
 
 app.use(express.static("public"));
 app.use(express.static(__dirname));
+app.use("/audio", express.static("audio"));
 
-let children = {}; 
-// { socketId: { socket, name } }
+// 保存設定
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "audio"),
+  filename: (req, file, cb) =>
+    cb(null, Date.now() + path.extname(file.originalname))
+});
+
+const upload = multer({ storage });
+
+// 親から音声アップロード
+app.post("/upload", upload.single("audio"), (req, res) => {
+  res.json({ url: "/audio/" + req.file.filename });
+});
+
+let children = {};
 
 function broadcastList() {
   const list = Object.entries(children).map(([id, data]) => ({
@@ -32,7 +50,7 @@ io.on("connection", (socket) => {
   socket.on("register-child", (name) => {
     children[socket.id] = {
       socket,
-      name: name || "NoName"
+      name
     };
     broadcastList();
   });
@@ -52,6 +70,11 @@ io.on("connection", (socket) => {
 
   socket.on("volume", ({ id, value }) => {
     children[id]?.socket.emit("volume", value);
+  });
+
+  // 新機能
+  socket.on("play-upload", ({ id, url }) => {
+    children[id]?.socket.emit("play-url", url);
   });
 
 });
