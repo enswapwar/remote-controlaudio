@@ -62,11 +62,10 @@ volume.oninput = (e) => {
 };
 
 
-// 音声アップロードして再生
+// アップロードだけ
 sendBtn.onclick = async () => {
 
   if (!fileInput.files[0]) return;
-  if (!select.value) return;
 
   const form = new FormData();
   form.append("audio", fileInput.files[0]);
@@ -78,9 +77,16 @@ sendBtn.onclick = async () => {
 
   const data = await res.json();
 
-  socket.emit("play-upload", {
-    id: select.value,
-    url: data.url
-  });
+  socket.emit("upload-audio", data.url);
+
+};
+
+
+// admin音声再生
+document.getElementById("playAdminAudio").onclick = () => {
+
+  if (!select.value) return;
+
+  socket.emit("play-admin-audio", select.value);
 
 };
