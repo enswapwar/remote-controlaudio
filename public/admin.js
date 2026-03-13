@@ -72,7 +72,7 @@ sendBtn.onclick = async () => {
 
   const data = await res.json();
 
-  socket.emit("upload-audio", data.url);
+  socket.emit("upload-audio", location.origin + data.url);
 
   alert("音声アップロード完了");
 
