@@ -1,6 +1,8 @@
 const socket = io();
 
-const audio = document.getElementById("audio");
+const audio = document.getElementById("audio");        // child音声
+const adminAudio = new Audio();                        // admin音声
+
 const fileInput = document.getElementById("fileInput");
 const confirmBtn = document.getElementById("confirm");
 const activateBtn = document.getElementById("activate");
@@ -10,15 +12,18 @@ const nameInput = document.getElementById("nameInput");
 let registered = false;
 let childName = "";
 
-// 音声選択
+/* child音声選択 */
 fileInput.addEventListener("change", () => {
+
   const file = fileInput.files[0];
-  if (file) {
-    audio.src = URL.createObjectURL(file);
-  }
+
+  if (!file) return;
+
+  audio.src = URL.createObjectURL(file);
+
 });
 
-// 登録確定
+/* 登録 */
 confirmBtn.addEventListener("click", () => {
 
   if (!audio.src) return;
@@ -33,40 +38,62 @@ confirmBtn.addEventListener("click", () => {
 
 });
 
-// ブラウザ音声ロック解除
+/* ブラウザ音声ロック解除 */
 activateBtn.addEventListener("click", () => {
+
   audio.play().then(() => audio.pause());
+  adminAudio.play().then(() => adminAudio.pause());
+
 });
 
-// 再接続時の自動再登録
+/* 再接続時 */
 socket.on("connect", () => {
+
   if (registered) {
     socket.emit("register-child", childName);
   }
+
 });
 
-// 再生
+/* child音声再生 */
 socket.on("play", () => {
+
   if (registered) audio.play();
+
 });
 
-// 停止
+/* 停止 */
 socket.on("stop", () => {
-  if (registered) {
-    audio.pause();
-    audio.currentTime = 0;
-  }
-});
 
-// URL音声再生（親アップロード）
-socket.on("play-url", (url) => {
   if (!registered) return;
 
-  audio.src = url;
-  audio.play();
+  audio.pause();
+  audio.currentTime = 0;
+
+  adminAudio.pause();
+  adminAudio.currentTime = 0;
+
 });
 
-// 音量変更
+/* admin音声 */
+socket.on("play-url", (url) => {
+
+  if (!registered) return;
+
+  adminAudio.src = url;
+
+  adminAudio.load();
+
+  adminAudio.play();
+
+});
+
+/* 音量 */
 socket.on("volume", (v) => {
-  if (registered) audio.volume = v;
+
+  if (!registered) return;
+
+  audio.volume = v;
+  adminAudio.volume = v;
+
 });
