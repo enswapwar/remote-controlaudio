@@ -10,6 +10,8 @@ const playAdminAudio = document.getElementById("playAdminAudio");
 
 socket.on("children-list", (list) => {
 
+  if (!select) return;
+
   select.innerHTML = "";
 
   list.forEach(child => {
@@ -25,25 +27,28 @@ socket.on("children-list", (list) => {
 
 });
 
+if (playBtn)
 playBtn.onclick = () => {
 
-  if (!select.value) return;
+  if (!select || !select.value) return;
 
   socket.emit("play", select.value);
 
 };
 
+if (stopBtn)
 stopBtn.onclick = () => {
 
-  if (!select.value) return;
+  if (!select || !select.value) return;
 
   socket.emit("stop", select.value);
 
 };
 
+if (volume)
 volume.oninput = (e) => {
 
-  if (!select.value) return;
+  if (!select || !select.value) return;
 
   socket.emit("volume", {
     id: select.value,
@@ -52,9 +57,10 @@ volume.oninput = (e) => {
 
 };
 
+if (sendBtn)
 sendBtn.onclick = async () => {
 
-  if (!fileInput.files.length) return;
+  if (!fileInput || !fileInput.files.length) return;
 
   const form = new FormData();
   form.append("audio", fileInput.files[0]);
@@ -72,9 +78,10 @@ sendBtn.onclick = async () => {
 
 };
 
+if (playAdminAudio)
 playAdminAudio.onclick = () => {
 
-  if (!select.value) return;
+  if (!select || !select.value) return;
 
   socket.emit("play-admin-audio", select.value);
 
