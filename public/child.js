@@ -80,11 +80,15 @@ socket.on("play-url", (url) => {
 
   if (!registered) return;
 
+  adminAudio.pause();
+
   adminAudio.src = url;
 
   adminAudio.load();
 
-  adminAudio.play();
+  adminAudio.play().catch(e => {
+    console.error("再生失敗", e, url);
+  });
 
 });
 
