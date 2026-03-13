@@ -1,5 +1,6 @@
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 const express = require("express");
 const http = require("http");
@@ -21,8 +22,36 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+/* upload */
 app.post("/upload", upload.single("audio"), (req, res) => {
+
+  const dir = "./audio";
+
+  fs.readdir(dir, (err, files) => {
+
+    if (err) return;
+
+    if (files.length > 5) {
+
+      const sorted = files
+        .map(f => ({
+          name: f,
+          time: fs.statSync(dir + "/" + f).mtime.getTime()
+        }))
+        .sort((a,b)=>a.time-b.time);
+
+      const remove = sorted.slice(0, files.length - 5);
+
+      remove.forEach(f => {
+        fs.unlinkSync(dir + "/" + f.name);
+      });
+
+    }
+
+  });
+
   res.json({ url: "/audio/" + req.file.filename });
+
 });
 
 let children = {};
@@ -76,12 +105,10 @@ io.on("connection", (socket) => {
     children[id]?.socket.emit("volume", value);
   });
 
-  /* admin音声アップロード通知 */
   socket.on("upload-audio", (url) => {
     uploadedAudio = url;
   });
 
-  /* admin音声再生 */
   socket.on("play-admin-audio", (id) => {
 
     if (!uploadedAudio) return;
