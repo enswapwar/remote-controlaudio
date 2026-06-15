@@ -88,6 +88,12 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
 
+    const child = children[socket.id];
+
+    if (child) {
+      console.log(child.name + "が切断されました")
+    }
+
     delete children[socket.id];
     
     
@@ -106,11 +112,12 @@ io.on("connection", (socket) => {
 
   socket.on("volume", ({ id, value }) => {
     children[id]?.socket.emit("volume", value);
+    console.log("ボリュームが" + value + "に変更されました！")
   });
 
   socket.on("upload-audio", (url) => {
     uploadedAudio = url;
-    console.log("音声ファイルがアップロードされました！");
+    console.log("音声ファイルがアップロードされました！" + url);
   });
 
   socket.on("play-admin-audio", (id) => {
@@ -119,6 +126,8 @@ io.on("connection", (socket) => {
 
     children[id]?.socket.emit("play-url", uploadedAudio);
 
+    console.log("アップロードされた音声がplayされました！" + uploadedAudio)
+    
   });
 
 });
