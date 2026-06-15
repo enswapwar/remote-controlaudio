@@ -82,23 +82,26 @@ io.on("connection", (socket) => {
       socket,
       name
     };
-
+  console.log(name + "が登録しました！");
     broadcastList();
   });
 
   socket.on("disconnect", () => {
 
     delete children[socket.id];
-
+    
+    
     broadcastList();
   });
 
   socket.on("play", (id) => {
     children[id]?.socket.emit("play");
+    console.log("誰かがplayボタンを押したようです。");
   });
 
   socket.on("stop", (id) => {
     children[id]?.socket.emit("stop");
+    console.log("誰かがstopボタンを押したようです。");
   });
 
   socket.on("volume", ({ id, value }) => {
@@ -107,6 +110,7 @@ io.on("connection", (socket) => {
 
   socket.on("upload-audio", (url) => {
     uploadedAudio = url;
+    console.log("音声ファイルがアップロードされました！");
   });
 
   socket.on("play-admin-audio", (id) => {
